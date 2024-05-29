@@ -1,14 +1,33 @@
-import { Box, Button, Container, Flex, Heading, HStack, Image, Link, SimpleGrid, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Heading, HStack, Image, Link, SimpleGrid, Text, VStack, IconButton } from "@chakra-ui/react";
+import { FaFacebook, FaTwitter, FaInstagram, FaStar } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 
 const Index = () => {
   const [recipes, setRecipes] = useState([]);
+  const [ratings, setRatings] = useState({});
 
   useEffect(() => {
     const storedRecipes = JSON.parse(localStorage.getItem("recipes")) || [];
     setRecipes(storedRecipes);
+  const storedRatings = JSON.parse(localStorage.getItem("ratings")) || {};
+    setRatings(storedRatings);
   }, []);
+
+  const handleRating = (recipeIndex, rating) => {
+    const newRatings = { ...ratings };
+    if (!newRatings[recipeIndex]) {
+      newRatings[recipeIndex] = [];
+    }
+    newRatings[recipeIndex].push(rating);
+    setRatings(newRatings);
+    localStorage.setItem("ratings", JSON.stringify(newRatings));
+  };
+
+  const getAverageRating = (recipeIndex) => {
+    if (!ratings[recipeIndex] || ratings[recipeIndex].length === 0) return 0;
+    const sum = ratings[recipeIndex].reduce((a, b) => a + b, 0);
+    return (sum / ratings[recipeIndex].length).toFixed(1);
+  };
 
   return (
     <Container maxW="container.xl" p={0}>
@@ -41,6 +60,17 @@ const Index = () => {
                 <Heading as="h4" size="md" mb={2}>{recipe.title}</Heading>
                 <Text>{recipe.ingredients.join(", ")}</Text>
                 <Text mt={4}>{recipe.instructions}</Text>
+                <HStack mt={4}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <IconButton
+                      key={star}
+                      icon={<FaStar />}
+                      colorScheme={ratings[index] && ratings[index].includes(star) ? "yellow" : "gray"}
+                      onClick={() => handleRating(index, star)}
+                    />
+                  ))}
+                </HStack>
+                <Text mt={2}>Average Rating: {getAverageRating(index)}</Text>
               </Box>
             </Box>
           ))}
