@@ -1,7 +1,15 @@
 import { Box, Button, Container, Flex, Heading, HStack, Image, Link, SimpleGrid, Text, VStack } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 
 const Index = () => {
+  const [recipes, setRecipes] = useState([]);
+
+  useEffect(() => {
+    const storedRecipes = JSON.parse(localStorage.getItem("recipes")) || [];
+    setRecipes(storedRecipes);
+  }, []);
+
   return (
     <Container maxW="container.xl" p={0}>
       {/* Navigation Bar */}
@@ -26,27 +34,16 @@ const Index = () => {
       <Box as="section" py={20}>
         <Heading as="h3" size="xl" textAlign="center" mb={10}>Featured Recipes</Heading>
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
-          <Box borderWidth="1px" borderRadius="lg" overflow="hidden">
-            <Image src="https://via.placeholder.com/300" alt="Recipe 1" />
-            <Box p={6}>
-              <Heading as="h4" size="md" mb={2}>Recipe Title 1</Heading>
-              <Text>Short description of the recipe.</Text>
+          {recipes.map((recipe, index) => (
+            <Box key={index} borderWidth="1px" borderRadius="lg" overflow="hidden">
+              <Image src={recipe.image} alt={`Recipe ${index + 1}`} />
+              <Box p={6}>
+                <Heading as="h4" size="md" mb={2}>{recipe.title}</Heading>
+                <Text>{recipe.ingredients.join(", ")}</Text>
+                <Text mt={4}>{recipe.instructions}</Text>
+              </Box>
             </Box>
-          </Box>
-          <Box borderWidth="1px" borderRadius="lg" overflow="hidden">
-            <Image src="https://via.placeholder.com/300" alt="Recipe 2" />
-            <Box p={6}>
-              <Heading as="h4" size="md" mb={2}>Recipe Title 2</Heading>
-              <Text>Short description of the recipe.</Text>
-            </Box>
-          </Box>
-          <Box borderWidth="1px" borderRadius="lg" overflow="hidden">
-            <Image src="https://via.placeholder.com/300" alt="Recipe 3" />
-            <Box p={6}>
-              <Heading as="h4" size="md" mb={2}>Recipe Title 3</Heading>
-              <Text>Short description of the recipe.</Text>
-            </Box>
-          </Box>
+          ))}
         </SimpleGrid>
       </Box>
 
